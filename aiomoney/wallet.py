@@ -57,7 +57,7 @@ class YooMoneyWallet:
         response = await send_request(quickpay_url, response_without_data=True, params=params)
         
         return PaymentForm(
-            link_for_customer=response.url,
+            link_for_customer=str(response.url),
             payment_label=unique_label
         )
     
