@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Literal
 
 from pydantic import BaseModel, Field
+
+from .enums import OperationDirection
 
 
 class Operation(BaseModel):
@@ -9,12 +10,12 @@ class Operation(BaseModel):
     Описание платежной операции
     https://yoomoney.ru/docs/wallet/user-account/operation-history#response-operation
     """
-    operation_id: str
-    status: str
-    execution_datetime: datetime = Field(alias="datetime")
-    title: str
-    pattern_id: str | None
-    direction: Literal["in"] | Literal["out"]
-    amount: int
-    label: str | None
-    operation_type: str = Field(alias="type")
+    operation_id: str = Field(...)
+    status: str = Field(...)
+    execution_datetime: datetime = Field(..., alias="datetime")
+    title: str = Field(...)
+    pattern_id: str | None = Field(None)
+    direction: OperationDirection = Field(...)
+    amount: int = Field(...)
+    label: str | None = Field(None)
+    operation_type: str = Field(..., alias="type")

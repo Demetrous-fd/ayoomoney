@@ -1,42 +1,62 @@
-from aiomoney.request import send_request
+from pydantic import TypeAdapter
+from httpx import AsyncClient
+
 from aiomoney.types import AccountInfo, OperationDetails, Operation, PaymentSource, PaymentForm
 
 
 class YooMoneyWallet:
-    def __init__(self, access_token: str):
-        self.host = "https://yoomoney.ru"
-        self.__headers = dict(Authorization=f"Bearer {access_token}")
-    
+    def __init__(self, access_token: str, headers: dict | None = None):
+        self.__headers = {
+            "Authorization": f"Bearer {access_token}",
+            **headers
+        }
+
+        self.client = AsyncClient(
+            base_url="https://yoomoney.ru",
+            headers=self.__headers
+        )
+
+    async def close(self):
+        await self.client.aclose()
+
     @property
-    async def account_info(self) -> AccountInfo:
-        url = self.host + "/api/account-info"
-        response, data = await send_request(
-            url, headers=self.__headers
-        )
-        return AccountInfo.parse_obj(data)
-    
-    async def get_operation_details(self, operation_id: str) -> OperationDetails:
-        url = self.host + "/api/operation-details"
-        response, data = await send_request(
-            url, headers=self.__headers, data={"operation_id": operation_id}
-        )
-        return OperationDetails.parse_obj(data)
-    
-    async def get_operation_history(self, label: str | None = None) -> list[Operation, ...]:
-        """
-        Получение последних 30 операций. На 10.03.2023 API yoomoney напросто игнорирует указанные
-        в документации параметры https://yoomoney.ru/docs/payment-buttons/using-api/forms?lang=ru#parameters
-        """
-        history_url = self.host + "/api/operation-history"
-        response, data = await send_request(
-            history_url, headers=self.__headers
-        )
+    async def account_info(self) -> AccountInfo | None:
+        url = "/api/account-info"
+        response = await self.client.post(url)
+
+        if not response.is_success:
+            return
+
+        return AccountInfo.model_validate_json(response.content)
+
+    async def get_operation_details(self, operation_id: str) -> OperationDetails | None:
+        url = "/api/operation-details"
+        response = await self.client.post(url, data={"operation_id": operation_id})
+
+        if not response.is_success:
+            return
+
+        return OperationDetails.model_validate_json(response.content)
+
+    async def get_operation_history(self, records_count: int = 30, **params) -> list[Operation]:
+        result = []
+        url = "/api/operation-history"
+        params = {
+            "records": records_count,
+            **params
+        }
+        response = await self.client.post(url, data=params)
+
+        if not response.is_success:
+            return result
+
+        data = response.json()
         if operations := data.get("operations"):
-            parsed = [Operation.parse_obj(operation) for operation in operations]
-            if label:
-                parsed = [operation for operation in parsed if operation.label == label]
-            return parsed
-    
+            adapter = TypeAdapter(list[Operation])
+            result = adapter.validate_python(operations)
+
+        return result
+
     async def create_payment_form(self,
                                   amount_rub: int,
                                   unique_label: str,
@@ -44,7 +64,7 @@ class YooMoneyWallet:
                                   payment_source: PaymentSource = PaymentSource.BANK_CARD
                                   ) -> PaymentForm:
         account_info = await self.account_info
-        quickpay_url = "https://yoomoney.ru/quickpay/confirm.xml?"
+        url = "/quickpay/confirm.xml"
         params = {
             "receiver": account_info.account,
             "quickpay-form": "button",
@@ -53,20 +73,23 @@ class YooMoneyWallet:
             "successURL": success_redirect_url,
             "label": unique_label
         }
-        params = {k: v for k,v in params.items() if v}
-        response = await send_request(quickpay_url, response_without_data=True, params=params)
-        
+        params = {k: v for k, v in params.items() if v}
+        response = await self.client.post(url, params=params)
+
         return PaymentForm(
             link_for_customer=str(response.url),
             payment_label=unique_label
         )
-    
+
     async def check_payment_on_successful(self, label: str) -> bool:
         need_operations = await self.get_operation_history(label=label)
-        return bool(need_operations) and need_operations.pop().status == "success"
-    
-    async def revoke_token(self) -> None:
-        url = self.host + "/api/revoke"
-        response = await send_request(url=url, response_without_data=True, headers=self.__headers)
-        print(f"Запрос на отзыв токена завершен с кодом {response.status} "
-              f"https://yoomoney.ru/docs/wallet/using-api/authorization/revoke-access-token#response")
+        if not need_operations:
+            return False
+
+        operation = need_operations[0]
+        return operation.status == "success"
+
+    async def revoke_token(self) -> bool:
+        url = "/api/revoke"
+        response = await self.client.post(url)
+        return response.is_success

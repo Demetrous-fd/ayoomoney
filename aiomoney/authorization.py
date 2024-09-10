@@ -1,30 +1,34 @@
-from aiomoney.request import send_request
+from httpx import AsyncClient
 
-AUTH_APP_URL = "https://yoomoney.ru/oauth/authorize?client_id={client_id}&response_type=code" \
-               "&redirect_uri={redirect_uri}&scope={permissions}"
-
-GET_TOKEN_URL = "https://yoomoney.ru/oauth/token?code={code}&client_id={client_id}&" \
-                "grant_type=authorization_code&redirect_uri={redirect_uri}"
+AUTH_URL = "https://yoomoney.ru/oauth/authorize"
+TOKEN_URL = "https://yoomoney.ru/oauth/token"
 
 
 async def authorize_app(client_id, redirect_uri, app_permissions: list[str, ...]):
-    formatted_auth_app_url = AUTH_APP_URL.format(
+    auth_params = dict(
         client_id=client_id,
         redirect_uri=redirect_uri,
-        permissions="%20".join(app_permissions)
+        scope=app_permissions,
+        response_type="code"
     )
-    response = await send_request(formatted_auth_app_url, response_without_data=True)
+
+    async with AsyncClient() as client:
+        response = await client.post(AUTH_URL, params=auth_params)
     
     print(f"Перейдите по URL и подтвердите доступ для приложения\n{response.url}")
     code = input("Введите код в консоль >  ").strip()
     
-    get_token_url = GET_TOKEN_URL.format(
+    token_params = dict(
         code=code,
         client_id=client_id,
-        redirect_uri=redirect_uri
+        redirect_uri=redirect_uri,
+        grant_type="authorization_code"
     )
-    _, data = await send_request(get_token_url)
-    
+    async with AsyncClient() as client:
+        response = await client.post(TOKEN_URL, params=token_params)
+
+    data = response.json()
+
     access_token = data.get("access_token")
     if not access_token:
         return print(f"Не удалось получить токен. {data.get('error', '')}")
