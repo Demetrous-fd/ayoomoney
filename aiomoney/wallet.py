@@ -6,6 +6,9 @@ from aiomoney.types import AccountInfo, OperationDetails, Operation, PaymentSour
 
 class YooMoneyWallet:
     def __init__(self, access_token: str, headers: dict | None = None):
+        if headers is None:
+            headers = {}
+
         self.__headers = {
             "Authorization": f"Bearer {access_token}",
             **headers
