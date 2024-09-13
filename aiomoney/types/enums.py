@@ -22,3 +22,9 @@ class OperationType(str, Enum):
     OUTGOING_TRANSFER = "outgoing-transfer"
     DEPOSITION = "deposition"
     INCOMING_TRANSFER = "incoming-transfer"
+
+
+class RecipientType(str, Enum):
+    ACCOUNT = "account"
+    PHONE = "phone"
+    EMAIL = "email"

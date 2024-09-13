@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 from .enums import OperationDirection, OperationStatus, OperationType
+from .operation_details import OperationDetails
 
 
 class Operation(BaseModel):
@@ -22,6 +23,6 @@ class Operation(BaseModel):
 
 
 class OperationHistory(BaseModel):
-    error: str = Field(...)
-    next_record: int = Field(...)
-    operations: list[Operation] = Field(...)
+    error: str | None = Field(None)
+    next_record: int | None = Field(None)
+    operations: list[Operation | OperationDetails] = Field(...)
