@@ -86,11 +86,11 @@ class YooMoneyWallet:
         )
 
     async def check_payment_on_successful(self, label: str) -> bool:
-        need_operations = await self.get_operation_history(label=label)
-        if not need_operations:
+        history = await self.get_operation_history(label=label)
+        if history is None or len(history.operations) <= 0:
             return False
 
-        operation = need_operations[0]
+        operation = history.operations[0]
         return operation.status == OperationStatus.SUCCESS
 
     async def revoke_token(self) -> bool:
