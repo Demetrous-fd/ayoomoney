@@ -3,13 +3,13 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aiomoney"
-version = "1.0.12"
+name = "ayoomoney"
+version = "1.0.0"
 authors = [
   { name="LazyDeus", email="dimaprodeus@yandex.ru" },
   { name="fofmow", email="fofmow@gmail.com" },
 ]
-description = "Простая асинхронная библиотека для работы с API ЮMoney"
+description = "Простая синхронная/асинхронная библиотека для работы с API ЮMoney"
 readme = "readme.md"
 requires-python = ">=3.11"
 classifiers = [
@@ -20,8 +20,9 @@ classifiers = [
 dependencies = [
     "httpx~=0.21.3",
     "pydantic~=2.0",
+    "click~=8.1"
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/Demetrous-fd/aiomoney"
-"Bug Tracker" = "https://github.com/Demetrous-fd/aiomoney/issues"
+"Homepage" = "https://github.com/Demetrous-fd/ayoomoney"
+"Bug Tracker" = "https://github.com/Demetrous-fd/ayoomoney/issues"
