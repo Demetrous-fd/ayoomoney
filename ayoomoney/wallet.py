@@ -17,7 +17,7 @@ class _BaseWallet:
         if headers is None:
             headers = {}
 
-        self.__headers = {
+        self._headers = {
             "Authorization": f"Bearer {access_token}",
             **headers
         }
@@ -54,7 +54,7 @@ class YooMoneyWallet(_BaseWallet):
         super().__init__(access_token, headers)
         self.client = Client(
             base_url=self.BASE_URL,
-            headers=self.__headers
+            headers=self._headers
         )
 
     def close(self):
@@ -119,7 +119,7 @@ class YooMoneyWalletAsync(_BaseWallet):
         super().__init__(access_token, headers)
         self.client = AsyncClient(
             base_url=self.BASE_URL,
-            headers=self.__headers
+            headers=self._headers
         )
 
     async def close(self):
