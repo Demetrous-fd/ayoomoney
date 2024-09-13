@@ -77,7 +77,7 @@ def authorize(
         exit(1)
 
     parts = redirect_uri.split(":")
-    if len(parts) > 1:
+    if len(parts) > 2:
         _port = int(parts[-1])
         if _port != port:
             print(
