@@ -4,13 +4,13 @@ from os import environ
 from dotenv import load_dotenv
 
 from ayoomoney.types import AccountInfo, OperationHistory, OperationDetails
-from ayoomoney.wallet import YooMoneyWallet
+from ayoomoney.wallet import YooMoneyWalletAsync
 
 load_dotenv()
 
 
 async def main():
-    wallet = YooMoneyWallet(access_token=environ.get("ACCESS_TOKEN"))
+    wallet = YooMoneyWalletAsync(access_token=environ.get("ACCESS_TOKEN"))
     
     account_info: AccountInfo = await wallet.account_info()
     """
@@ -30,6 +30,7 @@ async def main():
     operation_details: OperationDetails = await wallet.get_operation_details(operation_id="000")
     # details by operation ...
 
+    await wallet.close()
 
 if __name__ == "__main__":
     asyncio.run(main())

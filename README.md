@@ -39,7 +39,8 @@ def sync_example():
    account_info: AccountInfo = wallet.account_info()
    operation_history: OperationHistory = wallet.get_operation_history()
    operation_details: OperationDetails = wallet.get_operation_details(operation_id="42")
-
+    
+   wallet.close()
 
 async def async_example():
    wallet = YooMoneyWalletAsync(access_token="ACCESS_TOKEN")
@@ -47,7 +48,9 @@ async def async_example():
    account_info: AccountInfo = await wallet.account_info()
    operation_history: OperationHistory = await wallet.get_operation_history()
    operation_details: OperationDetails = await wallet.get_operation_details(operation_id="42")
-
+   
+   await wallet.close()
+   
 
 if __name__ == "__main__":
    sync_example()
@@ -81,6 +84,8 @@ async def main():
       f"Ссылка на оплату:\n{payment_form.link_for_customer}\n\n"
       f"Форма оплачена: {'Да' if payment_is_completed else 'Нет'}"
    )
+   
+   await wallet.close()
 
 
 if __name__ == "__main__":
