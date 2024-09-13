@@ -33,7 +33,7 @@ from ayoomoney.types import AccountInfo, OperationHistory, OperationDetails
 from ayoomoney.wallet import YooMoneyWalletAsync, YooMoneyWallet
 
 
-async def sync_example():
+def sync_example():
    wallet = YooMoneyWallet(access_token="ACCESS_TOKEN")
 
    account_info: AccountInfo = wallet.account_info()
