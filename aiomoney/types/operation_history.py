@@ -12,13 +12,13 @@ class Operation(BaseModel):
     """
     operation_id: str = Field(...)
     status: OperationStatus = Field(...)
-    datetime: datetime = Field(...)
+    execution_datetime: datetime = Field(..., alias="datetime")
     title: str = Field(...)
     pattern_id: str | None = Field(None)
     direction: OperationDirection = Field(...)
     amount: float = Field(...)
     label: str | None = Field(None)
-    type: OperationType = Field(...)
+    operation_type: OperationType = Field(..., alias="type")
 
 
 class OperationHistory(BaseModel):
