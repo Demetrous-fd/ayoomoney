@@ -2,12 +2,12 @@ from pydantic import BaseModel, Field
 
 
 class BalanceDetails(BaseModel):
-    total: int = Field(...)
-    available: int = Field(...)
-    deposition_pending: int | None = Field(None)
-    blocked: int | None = Field(None)
-    debt: int | None = Field(None)
-    hold: int | None = Field(None)
+    total: float = Field(...)
+    available: float = Field(...)
+    deposition_pending: float | None = Field(None)
+    blocked: float | None = Field(None)
+    debt: float | None = Field(None)
+    hold: float | None = Field(None)
 
 
 class LinkedCard(BaseModel):
@@ -21,7 +21,7 @@ class AccountInfo(BaseModel):
     https://yoomoney.ru/docs/wallet/user-account/account-info
     """
     account: str = Field(...)  # номер счета
-    balance: int = Field(...)  # баланс счета
+    balance: float = Field(...)  # баланс счета
     currency: str = Field(...)  # код валюты счета
     account_type: str = Field(...)
     account_status: str = Field(...)

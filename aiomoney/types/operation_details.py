@@ -10,14 +10,14 @@ class OperationDetails(BaseModel):
     Детальная информация об операции из истории
     https://yoomoney.ru/docs/wallet/user-account/operation-details
     """
-    amount: int = Field(...)
-    amount_due: int | None = Field(None)
+    amount: float = Field(...)
+    amount_due: float | None = Field(None)
     error: str | None = Field(None)
     operation_id: str = Field(...)
     direction: OperationDirection = Field(...)
     status: str = Field(...)
     pattern_id: str | None = Field(None)
-    fee: int | None = Field(None)
+    fee: float | None = Field(None)
     title: str = Field(...)
     sender: int | None = Field(None)
     recipient: str | None = Field(None)

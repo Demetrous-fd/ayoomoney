@@ -1,7 +1,13 @@
-from pydantic import TypeAdapter
 from httpx import AsyncClient
 
-from aiomoney.types import AccountInfo, OperationDetails, Operation, PaymentSource, PaymentForm
+from aiomoney.types import (
+    AccountInfo,
+    OperationDetails,
+    OperationStatus,
+    OperationHistory,
+    PaymentSource,
+    PaymentForm
+)
 
 
 class YooMoneyWallet:
@@ -41,8 +47,7 @@ class YooMoneyWallet:
 
         return OperationDetails.model_validate_json(response.content)
 
-    async def get_operation_history(self, records_count: int = 30, **params) -> list[Operation]:
-        result = []
+    async def get_operation_history(self, records_count: int = 30, **params) -> OperationHistory | None:
         url = "/api/operation-history"
         params = {
             "records": records_count,
@@ -51,14 +56,10 @@ class YooMoneyWallet:
         response = await self.client.post(url, data=params)
 
         if not response.is_success:
-            return result
+            return
 
-        data = response.json()
-        if operations := data.get("operations"):
-            adapter = TypeAdapter(list[Operation])
-            result = adapter.validate_python(operations)
-
-        return result
+        history = OperationHistory.model_validate_json(response.content)
+        return history
 
     async def create_payment_form(self,
                                   amount_rub: int,
@@ -90,7 +91,7 @@ class YooMoneyWallet:
             return False
 
         operation = need_operations[0]
-        return operation.status == "success"
+        return operation.status == OperationStatus.SUCCESS
 
     async def revoke_token(self) -> bool:
         url = "/api/revoke"
