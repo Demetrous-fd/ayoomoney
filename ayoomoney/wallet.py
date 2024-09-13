@@ -51,7 +51,7 @@ class _BaseWallet:
 
 class YooMoneyWallet(_BaseWallet):
     def __init__(self, access_token: str, headers: dict | None = None):
-        super(_BaseWallet).__init__(access_token, headers)
+        super().__init__(access_token, headers)
         self.client = Client(
             base_url=self.BASE_URL,
             headers=self.__headers
@@ -116,7 +116,7 @@ class YooMoneyWallet(_BaseWallet):
 
 class YooMoneyWalletAsync(_BaseWallet):
     def __init__(self, access_token: str, headers: dict | None = None):
-        super(_BaseWallet).__init__(access_token, headers)
+        super().__init__(access_token, headers)
         self.client = AsyncClient(
             base_url=self.BASE_URL,
             headers=self.__headers
