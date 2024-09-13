@@ -2,7 +2,7 @@
 
 ### Установка
 ```shell
-pip install git+https://github.com/Demetrous-fd/ayoomoney.git
+pip install ayoomoney
 ```
 
 ### Авторизация приложения
