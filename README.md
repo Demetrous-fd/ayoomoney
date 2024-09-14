@@ -12,6 +12,10 @@ pip install ayoomoney
    - Чекбокс "Проверять подлинность приложения (OAuth2 client_secret)" должен быть отключен
 2. Получите и скопируйте `client_id` после создания приложения
 3. [Получение access-токена](https://yoomoney.ru/docs/wallet/using-api/authorization/obtain-access-token)
+   
+   Во всех методах используются все доступные разрешения/scope, вы можете указать нужные вам разрешения
+   через запятую, используя параметр `--scope`, пример: `--scope account-info,operation-details,operation-history` 
+
    - Автоматическое получение
    ```shell
    python -m ayoomoney.auth auto <client_id> http://my.localhost
