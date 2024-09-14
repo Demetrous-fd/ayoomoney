@@ -1,2 +1,2 @@
-from .wallet import YooMoneyWallet
+from .wallet import YooMoneyWallet, YooMoneyWalletAsync
 from . import auth, errors, types
