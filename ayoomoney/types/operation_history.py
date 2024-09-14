@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, conint, field_serializer
 
-from .enums import OperationDirection, OperationStatus, OperationType
+from .enums import OperationDirection, OperationStatus, OperationType, OperationHistoryParamType
 from .operation_details import OperationDetails
+from .utils import convert_datetime_to_iso_8601
 
 
 class Operation(BaseModel):
@@ -26,3 +27,17 @@ class OperationHistory(BaseModel):
     error: str | None = Field(None)
     next_record: int | None = Field(None)
     operations: list[Operation | OperationDetails] = Field(...)
+
+
+class OperationHistoryParams(BaseModel):
+    operation_type: list[OperationHistoryParamType] | None = Field(default=None, serialization_alias="type")
+    label: str | None = Field(default=None)
+    from_datetime: datetime | None = Field(default=None, serialization_alias="from")
+    till_datetime: datetime | None = Field(default=None, serialization_alias="till")
+    start_record: str | None = Field(default=None)
+    records: conint(ge=1, le=100) | None = Field(default=None)
+    details: bool | None = Field(default=None)
+
+    @field_serializer("from_datetime", "till_datetime")
+    def convert_datetime_to_iso8601(self, v: datetime, _info) -> str:
+        return convert_datetime_to_iso_8601(v)

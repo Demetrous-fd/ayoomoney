@@ -3,18 +3,11 @@ from contextlib import closing
 import socketserver
 import socket
 
-import httpx
+from .base import Authorization, DEFAULT_SCOPE
+from ayoomoney.errors import CreateTokenError
 
 HOST = "127.0.0.1"
 PORT = 80
-DEFAULT_SCOPE = (
-    "account-info",
-    "operation-history",
-    "operation-details",
-    "incoming-transfers",
-    "payment-p2p",
-    "payment-shop",
-)
 
 
 def is_port_free(host, port) -> bool:
@@ -28,6 +21,8 @@ def is_port_free(host, port) -> bool:
 class CodeHandler(BaseHTTPRequestHandler):
     client_id = None
     redirect_url = None
+    auth_client: Authorization = None
+    access_token: str | None = None
 
     def log_request(self, code: int | str = ..., size: int | str = ...) -> None:
         pass
@@ -39,31 +34,35 @@ class CodeHandler(BaseHTTPRequestHandler):
             return
 
         code = self.path.split("code=")[-1]
-        token_params = dict(
-            code=code,
-            client_id=self.client_id,
-            redirect_uri=self.redirect_url,
-            grant_type="authorization_code"
-        )
-        response = httpx.post("https://yoomoney.ru/oauth/token", params=token_params)
+        access_token = ""
+        error = None
 
-        data = response.json()
-        access_token = data.get("access_token")
+        try:
+            access_token = self.auth_client.get_access_token(code)
+        except CreateTokenError as e:
+            error = e
+
+        if error:
+            print(error)
+            body = f"""<div style="word-wrap: break-word;"><b>error:</b> {error}</div>"""
+        else:
+            body = f"""<div style="word-wrap: break-word;"><b>access_token:</b> {access_token}</div>"""
 
         print(f"{access_token=}")
-        body = f"""<div style="word-wrap: break-word;"><b>access_token:</b> {access_token}</div>"""
+        self.access_token = access_token
         self.send_response(200)
+        self.send_header("charset", "windows-1251")
         self.end_headers()
-        self.wfile.write(body.encode())
+        self.wfile.write(body.encode("windows-1251"))
 
 
 def authorize(
         client_id: str,
         redirect_uri: str,
-        app_permissions: list[str] = DEFAULT_SCOPE,
+        scope: list[str] = DEFAULT_SCOPE,
         host: str = HOST, port: int = PORT,
         *_
-):
+) -> str | None:
     if not is_port_free(host, port):
         print(
             f"Порт: {port} занят другим приложением. "
@@ -86,16 +85,11 @@ def authorize(
             )
             exit(1)
 
-    auth_params = dict(
-        client_id=client_id,
-        redirect_uri=redirect_uri,
-        scope=" ".join(app_permissions),
-        response_type="code"
-    )
-    response = httpx.post("https://yoomoney.ru/oauth/authorize", params=auth_params)
+    auth = Authorization(client_id, redirect_uri)
+    url = auth.authorization_request(scope=scope)
     print("\n".join([
         "Перейдите по ссылке и подтвердите доступ для приложения:",
-        str(response.url),
+        url,
         "",
         "После подтверждения вы получите access_token, его можно скопировать с web-страницы или консоли.",
         f"Для отмены операции перейдите по адресу: http://{host}:{port}",
@@ -105,5 +99,8 @@ def authorize(
     handler = CodeHandler
     handler.client_id = client_id
     handler.redirect_url = redirect_uri
+    handler.auth_client = auth
     with socketserver.TCPServer((host, port), CodeHandler) as httpd:
         httpd.handle_request()
+
+    return handler.access_token

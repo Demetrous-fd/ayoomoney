@@ -24,6 +24,11 @@ class OperationType(str, Enum):
     INCOMING_TRANSFER = "incoming-transfer"
 
 
+class OperationHistoryParamType(str, Enum):
+    DEPOSITION = "deposition"
+    PAYMENT = "payment"
+
+
 class RecipientType(str, Enum):
     ACCOUNT = "account"
     PHONE = "phone"

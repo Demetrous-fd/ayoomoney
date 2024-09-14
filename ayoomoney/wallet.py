@@ -6,8 +6,10 @@ from ayoomoney.types import (
     OperationStatus,
     OperationHistory,
     PaymentSource,
-    PaymentForm
+    PaymentForm,
+    OperationHistoryParams
 )
+import ayoomoney
 
 
 class _BaseWallet:
@@ -24,22 +26,37 @@ class _BaseWallet:
 
     def _process_account_info(self, response: Response) -> AccountInfo | None:
         if not response.is_success:
+            if response.status_code == 401:
+                raise ayoomoney.errors.InvalidTokenError
             return
 
         return AccountInfo.model_validate_json(response.content)
 
     def _process_get_operation_details(self, response: Response) -> OperationDetails | None:
         if not response.is_success:
+            if response.status_code == 401:
+                raise ayoomoney.errors.InvalidTokenError
             return
 
         return OperationDetails.model_validate_json(response.content)
 
     def _process_get_operation_history(self, response: Response) -> OperationHistory | None:
         if not response.is_success:
+            if response.status_code == 401:
+                raise ayoomoney.errors.InvalidTokenError
             return
 
         history = OperationHistory.model_validate_json(response.content)
         return history
+
+    def _process_create_payment_form(self, unique_label: str, response: Response) -> PaymentForm:
+        if response.status_code == 401:
+            raise ayoomoney.errors.InvalidTokenError
+
+        return PaymentForm(
+            link_for_customer=str(response.url),
+            payment_label=unique_label
+        )
 
     def _process_check_payment_on_successful(self, history: OperationHistory) -> bool:
         if history is None or len(history.operations) <= 0:
@@ -70,12 +87,9 @@ class YooMoneyWallet(_BaseWallet):
         response = self.client.post(url, data={"operation_id": operation_id})
         return self._process_get_operation_details(response)
 
-    def get_operation_history(self, records_count: int = 30, **params) -> OperationHistory | None:
+    def get_operation_history(self, params: OperationHistoryParams) -> OperationHistory | None:
         url = "/api/operation-history"
-        params = {
-            "records": records_count,
-            **params
-        }
+        params = params.model_dump(exclude_none=True, by_alias=True)
         response = self.client.post(url, data=params)
         return self._process_get_operation_history(response)
 
@@ -98,14 +112,11 @@ class YooMoneyWallet(_BaseWallet):
         }
         params = {k: v for k, v in params.items() if v}
         response = self.client.post(url, params=params)
-
-        return PaymentForm(
-            link_for_customer=str(response.url),
-            payment_label=unique_label
-        )
+        return self._process_create_payment_form(unique_label, response)
 
     def check_payment_on_successful(self, label: str) -> bool:
-        history = self.get_operation_history(label=label)
+        params = OperationHistoryParams(label=label)
+        history = self.get_operation_history(params)
         return self._process_check_payment_on_successful(history)
 
     def revoke_token(self) -> bool:
@@ -135,12 +146,12 @@ class YooMoneyWalletAsync(_BaseWallet):
         response = await self.client.post(url, data={"operation_id": operation_id})
         return self._process_get_operation_details(response)
 
-    async def get_operation_history(self, records_count: int = 30, **params) -> OperationHistory | None:
+    async def get_operation_history(self, params: OperationHistoryParams | None = None) -> OperationHistory | None:
+        if params is None:
+            params = OperationHistoryParams()
+
         url = "/api/operation-history"
-        params = {
-            "records": records_count,
-            **params
-        }
+        params = params.model_dump(exclude_none=True, by_alias=True)
         response = await self.client.post(url, data=params)
         return self._process_get_operation_history(response)
 
@@ -163,14 +174,11 @@ class YooMoneyWalletAsync(_BaseWallet):
         }
         params = {k: v for k, v in params.items() if v}
         response = await self.client.post(url, params=params)
-
-        return PaymentForm(
-            link_for_customer=str(response.url),
-            payment_label=unique_label
-        )
+        return self._process_create_payment_form(unique_label, response)
 
     async def check_payment_on_successful(self, label: str) -> bool:
-        history = await self.get_operation_history(label=label)
+        params = OperationHistoryParams(label=label)
+        history = await self.get_operation_history(params)
         return self._process_check_payment_on_successful(history)
 
     async def revoke_token(self) -> bool:

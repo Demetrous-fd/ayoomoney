@@ -15,7 +15,7 @@ def simple(client_id: str, redirect_url: str, scope: str):
     auth.simple.authorize(
         client_id,
         redirect_url,
-        app_permissions=scope.split(",") if scope else auth.simple.DEFAULT_SCOPE
+        scope=scope.split(",") if scope else auth.simple.DEFAULT_SCOPE
     )
 
 
@@ -31,7 +31,7 @@ def auto(client_id: str, redirect_url: str, host: str, port: int, scope: str):
         redirect_url,
         host=host,
         port=port,
-        app_permissions=scope.split(",") if scope else auth.auto.DEFAULT_SCOPE
+        scope=scope.split(",") if scope else auth.auto.DEFAULT_SCOPE
     )
 
 
