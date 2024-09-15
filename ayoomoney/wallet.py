@@ -1,3 +1,6 @@
+from types import TracebackType
+from typing import Self, Type
+
 from httpx import AsyncClient, Response, Client
 
 from ayoomoney.types import (
@@ -74,6 +77,17 @@ class YooMoneyWallet(_BaseWallet):
             headers=self._headers
         )
 
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Type[BaseException] | None = None,
+        exc_value: BaseException | None = None,
+        traceback: TracebackType | None = None,
+    ) -> None:
+        self.close()
+
     def close(self):
         self.client.close()
 
@@ -132,6 +146,17 @@ class YooMoneyWalletAsync(_BaseWallet):
             base_url=self.BASE_URL,
             headers=self._headers
         )
+
+    async def __aenter__(self) -> Self:
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: Type[BaseException] | None = None,
+        exc_value: BaseException | None = None,
+        traceback: TracebackType | None = None,
+    ) -> None:
+        await self.close()
 
     async def close(self):
         await self.client.aclose()
