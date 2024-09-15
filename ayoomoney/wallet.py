@@ -101,7 +101,10 @@ class YooMoneyWallet(_BaseWallet):
         response = self.client.post(url, data={"operation_id": operation_id})
         return self._process_get_operation_details(response)
 
-    def get_operation_history(self, params: OperationHistoryParams) -> OperationHistory | None:
+    def get_operation_history(self, params: OperationHistoryParams | None = None) -> OperationHistory | None:
+        if params is None:
+            params = OperationHistoryParams()
+
         url = "/api/operation-history"
         params = params.model_dump(exclude_none=True, by_alias=True)
         response = self.client.post(url, data=params)
