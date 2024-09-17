@@ -8,7 +8,7 @@ pip install ayoomoney
 ### Авторизация приложения
 
 1. Зарегистрируйте новое приложение YooMoney по ссылке https://yoomoney.ru/myservices/new 
-   - В полях "Адрес сайта" и "Redirect URI" укажите адрес: http://my.localhost
+   - В полях "Адрес сайта" и "Redirect URI" укажите адрес: http://my.localhost:8042
    - Чекбокс "Проверять подлинность приложения (OAuth2 client_secret)" должен быть отключен
 2. Получите и скопируйте `client_id` после создания приложения
 3. [Получение access-токена](https://yoomoney.ru/docs/wallet/using-api/authorization/obtain-access-token)
@@ -18,12 +18,12 @@ pip install ayoomoney
 
    - Автоматическое получение
    ```shell
-   python -m ayoomoney.auth auto <client_id> http://my.localhost
+   python -m ayoomoney.auth auto <client_id> http://my.localhost:8042
    ```
    
    - Ручное получение
    ```shell
-   python -m ayoomoney.auth simple <client_id> http://my.localhost
+   python -m ayoomoney.auth simple <client_id> http://my.localhost:8042
    ```
    Во время перенаправления по `redirect_uri` в адресной строке появится параметр `code=`.
    Скопируйте значение и вставьте его в консоль

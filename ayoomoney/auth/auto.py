@@ -7,7 +7,7 @@ from .base import Authorization, DEFAULT_SCOPE
 from ayoomoney.errors import CreateTokenError
 
 HOST = "127.0.0.1"
-PORT = 80
+PORT = 8042
 
 
 def is_port_free(host, port) -> bool:

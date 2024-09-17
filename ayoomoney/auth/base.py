@@ -42,7 +42,7 @@ class Authorization(_BaseAuthorization):
         )
 
     def close(self):
-        self.close()
+        self.client.close()
 
     def authorization_request(
             self,
