@@ -122,7 +122,7 @@ class YooMoneyWallet(_BaseWallet):
         params = {
             "receiver": account_info.account,
             "quickpay-form": "button",
-            "paymentType": payment_source,
+            "paymentType": payment_source.value,
             "sum": amount_rub,
             "successURL": success_redirect_url,
             "label": unique_label
@@ -195,7 +195,7 @@ class YooMoneyWalletAsync(_BaseWallet):
         params = {
             "receiver": account_info.account,
             "quickpay-form": "button",
-            "paymentType": payment_source,
+            "paymentType": payment_source.value,
             "sum": amount_rub,
             "successURL": success_redirect_url,
             "label": unique_label
