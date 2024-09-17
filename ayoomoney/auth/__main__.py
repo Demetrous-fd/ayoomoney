@@ -23,7 +23,7 @@ def simple(client_id: str, redirect_url: str, scope: str):
 @click.argument("client_id")
 @click.argument("redirect_url")
 @click.option("--host", default="127.0.0.1")
-@click.option("--port", default=80, help="Порт приложения")
+@click.option("--port", default=auth.auto.PORT, help="Порт приложения")
 @click.option("--scope", default="", help="Список разрешений/scope, по умолчанию включены все разрешения")
 def auto(client_id: str, redirect_url: str, host: str, port: int, scope: str):
     auth.auto.authorize(
