@@ -2,25 +2,10 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, conint, field_serializer
 
-from .enums import OperationDirection, OperationStatus, OperationType, OperationHistoryParamType
+from .operation import Operation
+from .enums import OperationHistoryParamType
 from .operation_details import OperationDetails
 from .utils import convert_datetime_to_iso_8601
-
-
-class Operation(BaseModel):
-    """
-    Описание платежной операции
-    https://yoomoney.ru/docs/wallet/user-account/operation-history#response-operation
-    """
-    operation_id: str = Field(...)
-    status: OperationStatus = Field(...)
-    execution_datetime: datetime = Field(..., alias="datetime")
-    title: str = Field(...)
-    pattern_id: str | None = Field(None)
-    direction: OperationDirection = Field(...)
-    amount: float = Field(...)
-    label: str | None = Field(None)
-    operation_type: OperationType = Field(..., alias="type")
 
 
 class OperationHistory(BaseModel):

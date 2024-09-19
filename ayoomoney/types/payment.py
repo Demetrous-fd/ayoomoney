@@ -1,7 +1,6 @@
-from dataclasses import dataclass
+from pydantic import BaseModel, Field
 
 
-@dataclass(frozen=True, slots=True)
-class PaymentForm:
-    link_for_customer: str
-    payment_label: str
+class PaymentForm(BaseModel):
+    link_for_customer: str = Field(...)
+    payment_label: str = Field(...)

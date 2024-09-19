@@ -6,8 +6,12 @@ from .enums import (
     OperationType,
     RecipientType,
 )
+from .operation import Operation
+from .operation_history import (
+    OperationHistory,
+    OperationHistoryParams
+)
 from .operation_details import OperationDetails
-from .operation_history import Operation, OperationHistory, OperationHistoryParams
 from .account_info import AccountInfo
 from .payment import PaymentForm
 

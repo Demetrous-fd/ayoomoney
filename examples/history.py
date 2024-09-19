@@ -18,7 +18,7 @@ async def main():
             # Типы операций, можно использовать OperationHistoryParamType или вводить значения вручную
 
             records=3,  # limit, Количество операций за один запрос, по умолчанию 30
-            start_record=3,  # offset, https://yoomoney.ru/docs/wallet/user-account/operation-history#filtering-logic
+            start_record=0,  # offset, https://yoomoney.ru/docs/wallet/user-account/operation-history#filtering-logic
 
             details=True  # Показывать подробные детали операции. types.Operation -> types.OperationDetails
         )
