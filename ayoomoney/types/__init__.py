@@ -5,6 +5,7 @@ from .enums import (
     PaymentSource,
     OperationType,
     RecipientType,
+    NotificationType
 )
 from .operation import Operation
 from .operation_history import (
@@ -14,4 +15,5 @@ from .operation_history import (
 from .operation_details import OperationDetails
 from .account_info import AccountInfo
 from .payment import PaymentForm
+from .notification import NotificationBase, NotificationExtend
 

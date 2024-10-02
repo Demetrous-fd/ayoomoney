@@ -1,35 +1,40 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class PaymentSource(str, Enum):
+class PaymentSource(StrEnum):
     BANK_CARD = "AC"
     YOOMONEY_WALLET = "PC"
 
 
-class OperationDirection(str, Enum):
+class OperationDirection(StrEnum):
     IN = "in"
     OUT = "out"
 
 
-class OperationStatus(str, Enum):
+class OperationStatus(StrEnum):
     SUCCESS = "success"
     REFUSED = "refused"
     IN_PROGRESS = "in_progress"
 
 
-class OperationType(str, Enum):
+class OperationType(StrEnum):
     PAYMENT_SHOP = "payment-shop"
     OUTGOING_TRANSFER = "outgoing-transfer"
     DEPOSITION = "deposition"
     INCOMING_TRANSFER = "incoming-transfer"
 
 
-class OperationHistoryParamType(str, Enum):
+class OperationHistoryParamType(StrEnum):
     DEPOSITION = "deposition"
     PAYMENT = "payment"
 
 
-class RecipientType(str, Enum):
+class RecipientType(StrEnum):
     ACCOUNT = "account"
     PHONE = "phone"
     EMAIL = "email"
+
+
+class NotificationType(StrEnum):
+    P2P_INCOMING = "p2p-incoming"
+    CARD_INCOMING = "card-incoming"
