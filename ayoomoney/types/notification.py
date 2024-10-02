@@ -13,7 +13,7 @@ class NotificationBase(BaseModel):
     notification_type: NotificationType = Field(...)
     operation_id: str = Field(...)
     amount: Decimal = Field(..., decimal_places=2)
-    withdraw_amount: Decimal = Field(..., decimal_places=2)
+    withdraw_amount: Decimal | None = Field(None, decimal_places=2)
     currency: Literal["643"] = Field(...)
     execution_datetime: datetime = Field(..., alias="datetime")
     sender: str = Field(default="")
@@ -32,23 +32,19 @@ class NotificationBase(BaseModel):
         return str(v).lower()
 
     def check_sha1_hash(self, notification_secret: str) -> bool:
-        data = self.model_dump(
-            exclude_none=True,
-            exclude={
-                "withdraw_amount",
-                "sha1_hash",
-                "unaccepted",
-            },
-            by_alias=True
-        )
-        label = data.pop("label")
-        data["notification_secret"] = notification_secret
-        data["label"] = label
-
-        result_string = "&".join([str(v) for v in data.values()])
+        result_string = "&".join([
+            self.notification_type,
+            self.operation_id,
+            str(self.amount),
+            self.currency,
+            convert_datetime_to_iso_8601(self.execution_datetime, True).replace(".000+00:00", "Z"),
+            self.sender,
+            f"{self.codepro}".lower(),
+            notification_secret,
+            self.label,
+        ])
         hash_string = sha1(result_string.encode("utf8"))
-        hash_string = hash_string.hexdigest().lower()
-
+        hash_string = hash_string.hexdigest()
         return self.sha1_hash == hash_string
 
 
