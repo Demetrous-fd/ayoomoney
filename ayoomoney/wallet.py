@@ -74,7 +74,8 @@ class YooMoneyWallet(_BaseWallet):
         super().__init__(access_token, headers)
         self.client = Client(
             base_url=self.BASE_URL,
-            headers=self._headers
+            headers=self._headers,
+            follow_redirects=True
         )
 
     def __enter__(self) -> Self:
@@ -112,7 +113,7 @@ class YooMoneyWallet(_BaseWallet):
 
     def create_payment_form(
             self,
-            amount_rub: int,
+            amount_rub: int | float,
             unique_label: str,
             success_redirect_url: str | None = None,
             payment_source: PaymentSource = PaymentSource.BANK_CARD
@@ -147,7 +148,8 @@ class YooMoneyWalletAsync(_BaseWallet):
         super().__init__(access_token, headers)
         self.client = AsyncClient(
             base_url=self.BASE_URL,
-            headers=self._headers
+            headers=self._headers,
+            follow_redirects=True
         )
 
     async def __aenter__(self) -> Self:
@@ -185,7 +187,7 @@ class YooMoneyWalletAsync(_BaseWallet):
 
     async def create_payment_form(
             self,
-            amount_rub: int,
+            amount_rub: int | float,
             unique_label: str,
             success_redirect_url: str | None = None,
             payment_source: PaymentSource = PaymentSource.BANK_CARD
