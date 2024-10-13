@@ -4,3 +4,4 @@ venv/
 .env
 /dist/
 /ayoomoney.egg-info/
+/examples/notification/bot.db

@@ -163,6 +163,36 @@ if __name__ == '__main__':
 
 ```
 
+### HTTP-уведомления
+В библиотеке реализованы только модели уведомлений, реализовать http-сервера вы должны сами.
+
+Список моделей:
+- NotificationBase используется для http
+- NotificationExtend используется для https
+
+Примеры:
+- Простой пример с FastAPI
+   ```python
+   from typing import Annotated
+   
+   from fastapi import FastAPI, Form, HTTPException
+   from ayoomoney.types import NotificationBase
+   
+   YOOMONEY_NOTIFICATION_SECRET = "secret"
+   app = FastAPI()
+   
+   
+   @app.post("/notification")
+   async def payment_handler(data: Annotated[NotificationBase, Form()]):
+       # https://fastapi.tiangolo.com/tutorial/request-form-models/#pydantic-models-for-forms
+   
+       hash_is_good = data.check_sha1_hash(YOOMONEY_NOTIFICATION_SECRET)
+       if hash_is_good is False:
+           raise HTTPException(status_code=403)
+   
+   ```
+- [Телеграм бот на aiogram](https://github.com/Demetrous-fd/ayoomoney/tree/main/examples/notification)
+
 ### Поддержка проекта
 Если вы обнаружили ошибку или хотите предложить идею для улучшения проекта, создайте issue.
 
