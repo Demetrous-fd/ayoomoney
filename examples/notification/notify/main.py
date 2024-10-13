@@ -24,8 +24,8 @@ app = FastAPI(lifespan=lifespan)
 async def payment_handler(data: Annotated[NotificationBase, Form()]):
     # https://fastapi.tiangolo.com/tutorial/request-form-models/#pydantic-models-for-forms
 
-    hash_is_good = data.check_sha1_hash(settings.yoomoney_notification_secret)
-    if hash_is_good is False:
+    is_valid_hash = data.check_sha1_hash(settings.yoomoney_notification_secret)
+    if is_valid_hash is False:
         raise HTTPException(status_code=403)
 
     async with RedisBroker(settings.redis_dsn) as br:  # Используется для автоматического закрытия сессии
