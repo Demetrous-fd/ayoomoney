@@ -179,7 +179,6 @@ if __name__ == '__main__':
    from fastapi import FastAPI, Form, HTTPException
    from ayoomoney.types import NotificationBase
    
-   YOOMONEY_NOTIFICATION_SECRET = "secret"
    app = FastAPI()
    
    
